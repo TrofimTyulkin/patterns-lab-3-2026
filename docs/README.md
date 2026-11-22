@@ -1,12 +1,90 @@
-# Диаграмма
+# Диаграмма классов
 
-Поместите сюда структурную диаграмму итогового решения.
+Исходник диаграммы: [`architecture.mmd`](architecture.mmd) (Mermaid).
 
-Допустимые форматы:
+- **Strategy**: `OutputStrategy` — Strategy, `ConsoleOutput` / `FileOutput` / `UpperFileOutput` — ConcreteStrategy, `Logger` — Context.
+- **Factory Method**: `LoggerCreator` — Creator, `ConsoleLoggerCreator` / `FileLoggerCreator` / `UpperFileLoggerCreator` — ConcreteCreator, `OutputStrategy` — Product, конкретные стратегии — ConcreteProduct.
 
-- `architecture.puml`;
-- `architecture.mmd`;
-- изображение, экспортированное из diagrams.net;
-- другой согласованный с преподавателем формат.
+```mermaid
+classDiagram
+    direction TB
 
-На диаграмме должны быть различимы участники шаблонов Strategy и Factory Method.
+    namespace StrategyPattern {
+        class OutputStrategy {
+            <<Strategy>>
+            +write(message: str) None*
+        }
+        class ConsoleOutput {
+            <<ConcreteStrategy>>
+            +write(message: str) None
+        }
+        class FileOutput {
+            <<ConcreteStrategy>>
+            +path: Path
+            +write(message: str) None
+        }
+        class UpperFileOutput {
+            <<ConcreteStrategy>>
+            +write(message: str) None
+        }
+        class Logger {
+            <<Context>>
+            +strategy: OutputStrategy
+            +log(level: LogLevel, message: str) str
+        }
+    }
+
+    namespace FactoryMethodPattern {
+        class LoggerCreator {
+            <<Creator>>
+            +create_strategy() OutputStrategy*
+            +create_logger() Logger
+        }
+        class ConsoleLoggerCreator {
+            <<ConcreteCreator>>
+            +create_strategy() OutputStrategy
+        }
+        class FileLoggerCreator {
+            <<ConcreteCreator>>
+            +path: Path
+            +create_strategy() OutputStrategy
+        }
+        class UpperFileLoggerCreator {
+            <<ConcreteCreator>>
+            +create_strategy() OutputStrategy
+        }
+    }
+
+    class LogLevel {
+        <<enumeration>>
+        TRACE
+        INFO
+        WARN
+        ERROR
+        FATAL
+        +parse(level: str) LogLevel$
+    }
+
+    class app {
+        <<Client>>
+        +main() None
+    }
+
+    OutputStrategy <|-- ConsoleOutput
+    OutputStrategy <|-- FileOutput
+    FileOutput <|-- UpperFileOutput
+    Logger o--> OutputStrategy : strategy
+    Logger ..> LogLevel : uses
+
+    LoggerCreator <|-- ConsoleLoggerCreator
+    LoggerCreator <|-- FileLoggerCreator
+    FileLoggerCreator <|-- UpperFileLoggerCreator
+    LoggerCreator ..> Logger : creates
+    LoggerCreator ..> OutputStrategy : Product
+    ConsoleLoggerCreator ..> ConsoleOutput : creates
+    FileLoggerCreator ..> FileOutput : creates
+    UpperFileLoggerCreator ..> UpperFileOutput : creates
+
+    app ..> LoggerCreator : uses
+    app ..> LogLevel : uses
+```
