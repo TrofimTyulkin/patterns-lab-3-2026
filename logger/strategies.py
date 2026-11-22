@@ -28,15 +28,11 @@ class FileOutput(OutputStrategy):
     def write(self, message: str) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.path.open("a", encoding="utf-8") as stream:
-            stream.write(self._prepare(message) + "\n")
-
-    def _prepare(self, message: str) -> str:
-        """Точка расширения для преобразования сообщения перед записью."""
-        return message
+            stream.write(message + "\n")
 
 
 class UpperFileOutput(FileOutput):
     """ConcreteStrategy: запись в файл с переводом сообщения в верхний регистр."""
 
-    def _prepare(self, message: str) -> str:
-        return message.upper()
+    def write(self, message: str) -> None:
+        super().write(message.upper())

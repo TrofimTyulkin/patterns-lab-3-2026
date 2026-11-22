@@ -12,11 +12,7 @@ class LogLevel(str, Enum):
 
     @classmethod
     def parse(cls, level: LogLevel | str) -> LogLevel:
-        """Приводит значение к LogLevel или сообщает о некорректном уровне."""
         try:
             return cls(level)
         except ValueError:
-            allowed = ", ".join(member.value for member in cls)
-            raise ValueError(
-                f"Unknown log level: {level!r}. Allowed levels: {allowed}"
-            ) from None
+            raise ValueError(f"Unknown log level: {level!r}") from None
